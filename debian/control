@@ -1,0 +1,14 @@
+Source: python-termcolor
+Section: python
+Priority: optional
+Maintainer: Felipe Morales <hel.sheep@gmail.com>
+Build-Depends: cdbs, debhelper (>= 7.0.50~), python (>= 2.4), python-support
+XS-Python-Version: >= 2.4
+Standards-Version: 3.9.1
+Homepage: http://pypi.python.org/pypi/termcolor/0.2
+
+Package: python-termcolor
+Architecture: all
+Depends: ${python:Depends}, ${misc:Depends}
+Description: ANSII Color formatting for output in terminal.
+ Python functions for terminal output ANSII Color formatting.

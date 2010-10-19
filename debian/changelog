@@ -1,0 +1,5 @@
+python-termcolor (0.2-1) maverick; urgency=low
+
+  * Initial release (Closes: #0) 
+
+ -- Felipe Morales <hel.sheep@gmail.com>  Mon, 18 Oct 2010 20:08:42 -0300
