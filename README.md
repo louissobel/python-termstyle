@@ -60,6 +60,7 @@ Available attributes
  - concealed
 
 Not all attributes are available on all terminals:
+(this chart came from the python-termcolor, do not know how accurate it still is)
 ```
 ============ ======= ==== ========== ========== ======= =========
 Terminal     bold    dark underlined blink      reverse concealed
@@ -79,5 +80,9 @@ Mac Terminal yes     no   yes        yes        yes     yes
 
 Testing
 -------------------
-Testing is best conducted by sight, run the module
-and it will attempt to print the styles that it can.
+Testing is best conducted by sight, run the module `python termstyle.py`
+and it will attempt to print the styles that it can; verify that they look OK.
+
+Attribution
+-------------------
+This was forked from python-termcolor by Konstantin Lepa.

@@ -1,21 +1,7 @@
-# Copyright (C) 2008-2009 Konstantin Lepa <konstantin.lepa@gmail.com>.
-#
-# This file is part of termcolor.
-#
-# termcolor is free software; you can redistribute it and/or modify it
-# under the terms of the GNU General Public License as published by the Free
-# Software Foundation; either version 3, or (at your option) any later
-# version.
-#
-# termcolor is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-# more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with termcolor.  If not, see <http://www.gnu.org/licenses/>.
-
-"""ANSII Color formatting for output in terminal."""
+"""
+ANSII Color formatting for output in terminal
+using a natural language syntax
+"""
 
 import os
 import copy
@@ -24,7 +10,9 @@ __ALL__ = [ 'termstyle','Termstyle']
 
 
 class Termstyle:
-    
+    """
+    Immutable class representing a style
+    """
     
     COLORS = {
                 'grey' :    30,
@@ -66,73 +54,107 @@ class Termstyle:
         self.color = None
         self.background = None
     
-        #normal mode, on puts it in background mode
+        # parse state, 'on' attribute
+        # puts it in 'background' mode
         self.mode = 'normal'
         
         
-    def copy(self,**kwargs):
+    def copy(self, **kwargs):
+        """
+        Returns a deep copy of itself, setting any keyword arguments
+        passed as attributes of the new instance
+        """    
         new = copy.deepcopy(self)
         for attr, value in kwargs.items():
             setattr(new, attr, value)
         return new
     
-    def set_color(self,color):
+    def set_color(self, color):
+        """
+        Returns a new Termstyle instance with
+        the color attribute set to `color`
+        """
         return self.copy(color=color)
         
-    def set_background(self,color):
+    def set_background(self, color):
+        """
+        Returns a new Termstyle instance with
+        the background attribute set to `color`
+        """
         return self.copy(background=color)
         
-    def add_attribute(self,attribute):
+    def add_attribute(self, attribute):
+        """
+        Returns a new Termstyle instance with
+        the argument `attribute` appended
+        to its attrs `attribute`
+        """
         new = self.copy()
         new.attrs.append(attribute)      
         return new
         
-    def set_mode(self,mode):
+    def set_mode(self, mode):
+        """
+        Returns a new Termstyle instance with
+        the mode attribute set to `mode`
+        """
         return self.copy(mode=mode)
     
-    def __getattr__(self,attr):
+    def __getattr__(self, attr):
         """
-        Allows for styles to be strung together using a syntax like
-        termstyle.red.on.green.underlined
+        Plugs in to the python attribute lookup system to
+        allows for styles to be strung together using a syntax like
+        termstyle.red.on.green.underlined.
+        
+        Will return a new Termstyle instance with the new style.
         """
         
-        if attr in self.COLORS:        
+        if attr in self.COLORS:       
             if self.mode == 'normal':
                 return self.set_color(attr)
             else:
+                # self.mode is 'background', so we
+                # set the background color then
+                # reset the mode to 'normal'
                 return self.set_background(attr).set_mode('normal')
         
         elif attr in self.ATTRIBUTES:
             return self.add_attribute(attr)
             
-        elif attr == 'on':        
+        elif attr == 'on':
+            # set the mode to 'background',
+            # this determines how a color
+            # attribute is handled     
             return self.set_mode('background')
                    
         else:
-            raise AttributeError("No attribute found for termstyle %s"%attr)
+            raise AttributeError("No attribute found for termstyle %s" % attr)
 
         
     def __call__(self,text=""):
         
         if self.mode == 'background':
+            # cannot call the style if there is an unresolved 'on'
             raise SyntaxError("'on' must have a color after it to set the background")        
 
         if os.getenv('ANSI_COLORS_DISABLED'):
             return text
         
         else:    
-            style_escapes = ""
+            style_escapes = []
             
             if self.color:
-                style_escapes += (self.ESCAPE_FORMAT % self.COLORS[self.color])
+                style_escapes.append(self.COLORS[self.color])
 
             if self.background:
-                style_escapes += (self.ESCAPE_FORMAT % self.BACKGROUNDS[self.background])
+                style_escapes.append(self.BACKGROUNDS[self.background])
 
             for attr in self.attrs: # no-op if self.attrs is empty
-                style_escapes += (self.ESCAPE_FORMAT % self.ATTRIBUTES[attr])
+                style_escapes.append(self.ATTRIBUTES[attr])
+                
+            style_escape_string = ''.join(self.ESCAPE_FORMAT % escape for escape in style_escapes)
 
-            return "%s%s%s" % (style_escapes, text, self.RESET)
+            return "%s%s%s" % (style_escape_string, text, self.RESET)
 
     
     def __repr__(self):
