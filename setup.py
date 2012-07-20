@@ -3,9 +3,10 @@ from distutils.core import setup
 
 setup(
 	name='python-termstyle',
-	version='0.1',
+	version='1.0',
 	description='Terminal Styling',
-	url='',
+	url='http://github.com/louissobel/python-termstyle',
 	author='Louis Sobel',
-	py_modules=["termstyle"]
+	author_email='louis.a.sobel@gmail.com',
+	py_modules=["termstyle"],
 )
